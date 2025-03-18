@@ -1,4 +1,4 @@
-package org.example.classes.anonymousClasses;
+package org.example.anonymousClasses;
 
 public class AccountsWallet {
     Account checkingAccount = new Account(){

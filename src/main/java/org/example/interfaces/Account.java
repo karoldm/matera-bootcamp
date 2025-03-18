@@ -1,4 +1,4 @@
-package org.example.classes.interfaces;
+package org.example.interfaces;
 
 public interface Account {
     void deposit(Double value);

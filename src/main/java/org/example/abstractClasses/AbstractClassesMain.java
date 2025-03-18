@@ -1,4 +1,4 @@
-package org.example.classes.abstractClasses;
+package org.example.abstractClasses;
 
 public class AbstractClassesMain {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package org.example.classes.interfaces;
+package org.example.interfaces;
 
 public class SavingAccount implements Account{
     Double balance = 0.0;

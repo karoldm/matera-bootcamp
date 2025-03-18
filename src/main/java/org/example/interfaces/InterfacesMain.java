@@ -1,4 +1,4 @@
-package org.example.classes.interfaces;
+package org.example.interfaces;
 
 public class InterfacesMain {
     public static void main(String[] args) {

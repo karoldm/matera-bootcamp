@@ -1,4 +1,4 @@
-package org.example.classes.abstractClasses;
+package org.example.abstractClasses;
 
 public abstract class Account {
     private Double  balance;
