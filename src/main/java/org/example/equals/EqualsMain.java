@@ -15,6 +15,12 @@ public class EqualsMain {
           Comparação com .equals() (Comparação de Conteúdo)
              name1.equals(name2): Retorna true porque ambos possuem o mesmo conteúdo, mesmo que a verificação com == também fosse verdadeira.
              name1.equals(name3): Retorna true porque .equals() compara o conteúdo da string, e não a referência na memória.
+
+          O String Pool é um mecanismo de otimização de memória em Java que armazena strings literais dentro do String Constant Pool, uma área especial da Heap Memory.
+          Desse modo as variáveis:
+           String s1 = "Example";
+           String s2 = "Example";
+          Apontariam para a mesma instância de "Example" dentro da String pool. Isso ocorre porque o Java reutiliza strings literais sempre que possível para economizar memória.
         */
         System.out.println(name1 == name3); // false
         System.out.println(name1.equals(name2)); // true
