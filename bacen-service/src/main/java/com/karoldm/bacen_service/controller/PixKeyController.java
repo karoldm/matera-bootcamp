@@ -2,6 +2,7 @@ package com.karoldm.bacen_service.controller;
 
 import com.karoldm.bacen_service.dto.PixKeyRequestDTO;
 import com.karoldm.bacen_service.dto.PixKeyResponseDTO;
+import com.karoldm.bacen_service.excetions.KeyAlreadyExistException;
 import com.karoldm.bacen_service.service.PixKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +26,6 @@ public class PixKeyController {
 
     @GetMapping("/{keyValue}")
     public ResponseEntity<PixKeyResponseDTO> getKey(@PathVariable String keyValue) {
-        try {
-            return ResponseEntity.status(OK).body(keyService.getKey(keyValue));
-        } catch(NoSuchElementException e) {
-            return ResponseEntity.status(NOT_FOUND).build();
-        }
+        return ResponseEntity.status(OK).body(keyService.getKey(keyValue));
     }
 }
