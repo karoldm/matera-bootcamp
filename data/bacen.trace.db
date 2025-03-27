@@ -1,3 +1,0 @@
-2025-03-26 19:39:57.650313-03:00 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM[*]"; expected "identifier"; SQL statement:
-SELECT * FROM [42001-232]
