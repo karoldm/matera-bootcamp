@@ -6,5 +6,5 @@ Repositório para guardar aulas e projetos desenvolvidos durante o bootcamp da [
 
 - main
   - Na main há varios pacotes separados por tópicos com códigos de exemplo dados em aula.
-- project/bacen-service
+- project
   - Projeto sendo desenvolvido durante o Bootcamp.  
