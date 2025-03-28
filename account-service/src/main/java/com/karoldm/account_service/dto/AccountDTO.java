@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
@@ -15,5 +16,5 @@ public class AccountDTO {
     private Integer agencyNumber;
     private Integer accountNumber;
     private String pixKey;
-    private Double balance;
+    private BigDecimal balance;
 }

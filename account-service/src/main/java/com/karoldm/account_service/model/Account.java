@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -33,24 +35,16 @@ public class Account {
     private String pixKey;
 
     @Column
-    private Double balance;
+    private BigDecimal balance;
 
-    public void deposit(Double value) {
-        this.balance += value;
+    @OneToMany(mappedBy="account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Pix> pixHistoric;
+
+    public void deposit(BigDecimal value) {
+        this.balance = this.balance.add(value);
     }
 
-    public void withdraw(Double value) {
-        if(value < 0){
-
-        }
-
-        if(this.balance < value) {
-            throw new InsufficientBalanceException(String.format(
-                    "Insufficient balance. Your balance is: %s, and you are trying withdraw %s",
-                    this.balance,
-                    value
-            ));
-        }
-        this.balance -= value;
+    public void withdraw(BigDecimal value) {
+        this.balance = this.balance.subtract(value);
     }
 }

@@ -5,12 +5,15 @@ import com.karoldm.account_service.dto.AccountRequestDTO;
 import com.karoldm.account_service.dto.AccountResponseDTO;
 import com.karoldm.account_service.exception.AccountAlreadyExistsException;
 import com.karoldm.account_service.exception.AccountNotFoundException;
+import com.karoldm.account_service.feign.BacenService;
 import com.karoldm.account_service.model.Account;
 import com.karoldm.account_service.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +24,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class AccountService {
     private final AccountRepository accountRepository;
+    private final BacenService bacenService;
 
+    @Transactional
     public AccountResponseDTO createAccount(AccountRequestDTO accountRequestDTO) {
         Optional<Account> account = accountRepository.findByOwnerNameAndAccountNumberAndPixKey(
                 accountRequestDTO.getOwnerName(),
@@ -38,10 +43,11 @@ public class AccountService {
                 .accountNumber(accountRequestDTO.getAccountNumber())
                 .pixKey(accountRequestDTO.getPixKey())
                 .agencyNumber(accountRequestDTO.getAgencyNumber())
-                .balance(5000.0)
+                .balance(BigDecimal.valueOf(5000.0))
                 .build();
 
         Account savedAccount = accountRepository.save(newAccount);
+        bacenService.createPixKey(savedAccount.getPixKey());
 
         AccountResponseDTO response = AccountResponseDTO.builder()
                         .id(savedAccount.getId())
@@ -54,7 +60,7 @@ public class AccountService {
     }
 
     public List<AccountDTO> listAllAccounts() {
-        List<AccountDTO> accounts = accountRepository.findAll().stream().map(
+        return accountRepository.findAll().stream().map(
                 account -> AccountDTO.builder()
                         .accountNumber(account.getAccountNumber())
                         .id(account.getId())
@@ -64,8 +70,6 @@ public class AccountService {
                         .pixKey(account.getPixKey())
                         .build()
         ).toList();
-
-        return accounts;
     }
 
     public AccountDTO getAccount(UUID id){
@@ -73,7 +77,7 @@ public class AccountService {
                 () -> new AccountNotFoundException(String.format("Account with id %s doesn't exists", id))
         );
 
-        AccountDTO response = AccountDTO.builder()
+        return AccountDTO.builder()
                 .accountNumber(account.getAccountNumber())
                 .pixKey(account.getPixKey())
                 .agencyNumber(account.getAgencyNumber())
@@ -81,8 +85,6 @@ public class AccountService {
                 .id(account.getId())
                 .ownerName(account.getOwnerName())
                 .build();
-
-        return response;
     }
 
     public AccountResponseDTO updateAccount(AccountRequestDTO accountRequestDTO, UUID id) {
