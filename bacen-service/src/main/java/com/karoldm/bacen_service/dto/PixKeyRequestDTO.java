@@ -6,6 +6,5 @@ import jakarta.validation.constraints.NotNull;
 public record PixKeyRequestDTO(
         @NotEmpty
         String keyValue,
-        @NotNull
         boolean enabled
 ) {}

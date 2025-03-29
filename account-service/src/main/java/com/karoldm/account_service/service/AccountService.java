@@ -1,11 +1,11 @@
 package com.karoldm.account_service.service;
 
-import com.karoldm.account_service.dto.AccountDTO;
-import com.karoldm.account_service.dto.AccountRequestDTO;
-import com.karoldm.account_service.dto.AccountResponseDTO;
+import com.karoldm.account_service.dto.*;
 import com.karoldm.account_service.exception.AccountAlreadyExistsException;
 import com.karoldm.account_service.exception.AccountNotFoundException;
 import com.karoldm.account_service.feign.BacenService;
+import com.karoldm.account_service.feign.dto.PixKeyRequestDTO;
+import com.karoldm.account_service.feign.dto.PixKeyResponseDTO;
 import com.karoldm.account_service.model.Account;
 import com.karoldm.account_service.repository.AccountRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -87,29 +88,40 @@ public class AccountService {
                 .build();
     }
 
+    @Transactional
     public AccountResponseDTO updateAccount(AccountRequestDTO accountRequestDTO, UUID id) {
         Account account = accountRepository.findById(id).orElseThrow(
                 () -> new AccountNotFoundException(String.format("Account with id %s doesn't exists", id))
         );
+
+        if(!Objects.equals(accountRequestDTO.getPixKey(), account.getPixKey())) {
+            PixKeyRequestDTO pixKeyRequestDTO = new PixKeyRequestDTO(
+                    accountRequestDTO.getPixKey(),
+                    Boolean.TRUE
+            );
+            bacenService.updatePixKey(pixKeyRequestDTO, account.getPixKey());
+        }
 
         account.setAccountNumber(accountRequestDTO.getAccountNumber());
         account.setAgencyNumber(accountRequestDTO.getAgencyNumber());
         account.setOwnerName(accountRequestDTO.getOwnerName());
         account.setPixKey(accountRequestDTO.getPixKey());
 
-        account = accountRepository.save(account);
+        Account updatedAccount = accountRepository.save(account);
 
         return AccountResponseDTO.builder()
-                .id(account.getId())
-                .ownerName(account.getOwnerName())
+                .id(updatedAccount.getId())
+                .ownerName(updatedAccount.getOwnerName())
                 .build();
     }
 
+    @Transactional
     public void deleteAccount(UUID id) {
         Account account = accountRepository.findById(id).orElseThrow(
                 () -> new AccountNotFoundException(String.format("Account with id %s doesn't exists", id))
         );
 
+        bacenService.deletePixKey(account.getPixKey());
         accountRepository.deleteById(id);
     }
 }

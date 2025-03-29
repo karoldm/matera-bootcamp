@@ -3,9 +3,7 @@ package com.karoldm.account_service.feign;
 import com.karoldm.account_service.feign.dto.PixKeyRequestDTO;
 import com.karoldm.account_service.feign.dto.PixKeyResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 
 @FeignClient(
@@ -19,4 +17,10 @@ public interface BacenClient {
 
     @GetMapping(value = "/keys/{keyValue}")
     PixKeyResponseDTO getKey(@PathVariable final String keyValue);
+
+    @DeleteMapping("/keys/{keyValue}")
+    void deleteKey(@PathVariable final String keyValue);
+
+    @PutMapping("/keys/{keyValue}")
+    PixKeyResponseDTO updateKey(PixKeyRequestDTO pixKeyRequestDTO, @PathVariable String keyValue);
 }

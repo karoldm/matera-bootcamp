@@ -25,8 +25,8 @@ public class BacenService {
 
             return bacenClient.createKey(pixKeyRequestDTO);
         } catch (Exception ex) {
-            log.error("Error while creating pix key on bacen", ex);
-            throw new ErrorBacenIntegrationException("Error while creating pix key on bacen");
+            log.error("Error while create pix key on bacen", ex);
+            throw new ErrorBacenIntegrationException("Error while create pix key on bacen");
         }
     }
 
@@ -34,8 +34,27 @@ public class BacenService {
         try {
             return bacenClient.getKey(pixKey);
         } catch (Exception ex) {
-            log.error("Error while getting pix key on bacen", ex);
-            throw new ErrorBacenIntegrationException("Error while getting pix key on bacen");
+            log.error("Error while get pix key on bacen", ex);
+            throw new ErrorBacenIntegrationException("Error while get pix key on bacen");
+        }
+    }
+
+    public Void deletePixKey(final String pixKey){
+        try {
+            bacenClient.deleteKey(pixKey);
+        } catch (Exception ex) {
+            log.error("Error while delete pix key on bacen", ex);
+            throw new ErrorBacenIntegrationException("Error while delete pix key on bacen");
+        }
+        return null;
+    }
+
+    public PixKeyResponseDTO updatePixKey(PixKeyRequestDTO pixKeyRequestDTO, final String keyValue) {
+        try {
+            return bacenClient.updateKey(pixKeyRequestDTO, keyValue);
+        } catch (Exception ex) {
+            log.error("Error while update pix key on bacen", ex);
+            throw new ErrorBacenIntegrationException("Error while update pix key on bacen");
         }
     }
 }
