@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +38,43 @@ public class PixKeyService {
         return new PixKeyResponseDTO(newKey.getKeyValue(), newKey.isEnabled());
     }
 
-    @Transactional
     public PixKeyResponseDTO getKey(final String keyValue) throws KeyNotFoundException {
         PixKey key = keyRepository.findByKeyValue(keyValue).orElseThrow(
                 () -> new KeyNotFoundException(String.format("The key %s doesn't exists.", keyValue))
         );
         return new PixKeyResponseDTO(key.getKeyValue(), key.isEnabled());
+    }
+
+    @Transactional
+    public void deletekey(final String keyValue) {
+        PixKey key = keyRepository.findByKeyValue(keyValue).orElseThrow(
+                () -> new KeyNotFoundException(String.format("The key %s doesn't exists.", keyValue))
+        );
+        keyRepository.deleteById(key.getId());
+    }
+
+    @Transactional
+    public PixKeyResponseDTO updateKey(final PixKeyRequestDTO pixKeyRequestDTO, final String pixKey){
+        Optional<PixKey> newPixKey = keyRepository.findByKeyValue(pixKey);
+
+        if(newPixKey.isEmpty()){
+            throw new KeyNotFoundException(String.format("The key %s doesn't exists.", pixKey));
+        }
+
+        Optional<PixKey> existingKey = keyRepository.findByKeyValue(pixKeyRequestDTO.keyValue());
+
+        if(existingKey.isPresent()) {
+            throw new KeyAlreadyExistException(
+                    String.format("The key: %s already exist on the system.", pixKeyRequestDTO.keyValue())
+            );
+        }
+
+        PixKey updatedPixKey = newPixKey.get();
+        updatedPixKey.setEnabled(pixKeyRequestDTO.enabled());
+        updatedPixKey.setKeyValue(pixKeyRequestDTO.keyValue());
+
+        PixKey savedPixKey = keyRepository.save(updatedPixKey);
+
+        return new PixKeyResponseDTO(savedPixKey.getKeyValue(), savedPixKey.isEnabled());
     }
 }
