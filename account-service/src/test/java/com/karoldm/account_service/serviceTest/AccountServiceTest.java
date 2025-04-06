@@ -49,7 +49,7 @@ public class AccountServiceTest {
                 .agencyNumber(123)
                 .accountNumber(12345)
                 .pixKey("maria@pix.com")
-                .pixHistoric(List.of())
+                .pixHistory(List.of())
                 .build();
     }
 

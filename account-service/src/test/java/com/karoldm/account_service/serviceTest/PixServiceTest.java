@@ -1,6 +1,7 @@
 package com.karoldm.account_service.serviceTest;
 
 
+import com.karoldm.account_service.dto.PixHistoryResponseDTO;
 import com.karoldm.account_service.dto.PixRequestDTO;
 import com.karoldm.account_service.dto.PixResponseDTO;
 import com.karoldm.account_service.exception.AccountNotFoundException;
@@ -214,5 +215,41 @@ public class PixServiceTest {
 
         assertEquals(BigDecimal.valueOf(100.0), payerAccount.getBalance());
         assertEquals(BigDecimal.ZERO, receiverAccount.getBalance());
+    }
+
+    @Test
+    void mustGetPixHistoryOfUser(){
+        UUID userId = UUID.randomUUID();
+
+        payerAccount.addPixHistoric(Pix.builder()
+                .account(payerAccount)
+                .id(UUID.randomUUID())
+                .pixKeyReceiver(receiverAccount.getPixKey())
+                .pixKeyPayer(payerAccount.getPixKey())
+                .pixValue(BigDecimal.valueOf(100.0))
+                .createdAt(LocalDateTime.now())
+                .idempotent("pix-1")
+                .build());
+
+        when(accountRepository.findById(userId)).thenReturn(Optional.of(payerAccount));
+
+        PixHistoryResponseDTO pixHistoryResponseDTO = pixService.getPixHistory(userId);
+
+        verify(accountRepository, times(1)).findById(userId);
+
+        assertEquals(1, pixHistoryResponseDTO.getTotalPix());
+        assertEquals(payerAccount.getPixHistory().get(0).getId(), pixHistoryResponseDTO.getPixHistory().get(0).getId());
+    }
+
+    @Test
+    void mustThrowsNotFoundWhenGetPixHistory(){
+        UUID id = UUID.randomUUID();
+
+        when(accountRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(
+                AccountNotFoundException.class,
+                () -> pixService.getPixHistory(id)
+        );
     }
 }

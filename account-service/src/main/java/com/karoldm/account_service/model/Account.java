@@ -1,11 +1,11 @@
 package com.karoldm.account_service.model;
 
-import com.karoldm.account_service.exception.InsufficientBalanceException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +38,15 @@ public class Account {
     private BigDecimal balance;
 
     @OneToMany(mappedBy="account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Pix> pixHistoric;
+    private List<Pix> pixHistory;
+
+    public void addPixHistoric(Pix pix){
+        if(pixHistory == null){
+            pixHistory = new ArrayList<>();
+        }
+
+        pixHistory.add(pix);
+    }
 
     public void deposit(BigDecimal value) {
         this.balance = this.balance.add(value);

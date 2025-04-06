@@ -6,6 +6,7 @@ import com.karoldm.account_service.exception.AccountNotFoundException;
 import com.karoldm.account_service.feign.BacenService;
 import com.karoldm.account_service.feign.dto.PixKeyRequestDTO;
 import com.karoldm.account_service.feign.dto.PixKeyResponseDTO;
+import com.karoldm.account_service.mapper.PixToDTO;
 import com.karoldm.account_service.model.Account;
 import com.karoldm.account_service.repository.AccountRepository;
 import jakarta.transaction.Transactional;

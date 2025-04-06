@@ -2,9 +2,7 @@ package com.karoldm.account_service.controllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karoldm.account_service.controller.PixController;
-import com.karoldm.account_service.dto.PixDTO;
-import com.karoldm.account_service.dto.PixRequestDTO;
-import com.karoldm.account_service.dto.PixResponseDTO;
+import com.karoldm.account_service.dto.*;
 import com.karoldm.account_service.exception.AccountNotFoundException;
 import com.karoldm.account_service.exception.InsufficientBalanceException;
 import com.karoldm.account_service.service.PixService;
@@ -18,9 +16,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -114,5 +114,47 @@ public class PixControllerTest {
                         .content(objectMapper.writeValueAsString(pixRequestDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void mustGetPixHistory() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        UUID pixId = UUID.randomUUID();
+
+        PixDTO pixDTO = PixDTO.builder()
+                .pixValue(BigDecimal.valueOf(100.0))
+                .pixKeyReceiver("receiver@pix.com")
+                .pixKeyPayer("payer@pix.com")
+                .idempotent("test")
+                .id(pixId)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        ArrayList<PixDTO> pixList = new ArrayList<>();
+        pixList.add(pixDTO);
+
+        when(pixService.getPixHistory(id)).thenReturn(PixHistoryResponseDTO.builder()
+                        .totalPix(1)
+                        .pixHistory(pixList)
+                .build());
+
+        mockMvc.perform(get("/api/pix/history/"+id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("totalPix").value(1))
+                .andExpect(jsonPath("pixHistory").exists())
+                .andExpect(jsonPath("pixHistory[0].id").value(pixId.toString()));
+    }
+
+    @Test
+    void mustThrowsNotFoundWhenGetPixHistory() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        when(pixService.getPixHistory(id)).thenThrow(new AccountNotFoundException("Account not found"));
+
+        mockMvc.perform(get("/api/pix/history/"+id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

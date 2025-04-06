@@ -3,6 +3,7 @@ package com.karoldm.account_service.controller;
 import com.karoldm.account_service.dto.AccountDTO;
 import com.karoldm.account_service.dto.AccountRequestDTO;
 import com.karoldm.account_service.dto.AccountResponseDTO;
+import com.karoldm.account_service.dto.PixHistoryResponseDTO;
 import com.karoldm.account_service.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
