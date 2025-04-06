@@ -5,10 +5,11 @@ import com.karoldm.account_service.controller.PixController;
 import com.karoldm.account_service.dto.PixDTO;
 import com.karoldm.account_service.dto.PixRequestDTO;
 import com.karoldm.account_service.dto.PixResponseDTO;
+import com.karoldm.account_service.exception.AccountNotFoundException;
+import com.karoldm.account_service.exception.InsufficientBalanceException;
 import com.karoldm.account_service.service.PixService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -77,5 +78,41 @@ public class PixControllerTest {
                 .andExpect(jsonPath("pix.pixValue").value(pixDTO.getPixValue()))
                 .andExpect(jsonPath("pix.idempotent").value(pixDTO.getIdempotent()))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void mustReturnNotFound() throws Exception {
+
+        PixRequestDTO pixRequestDTO = PixRequestDTO.builder()
+                .pixValue(BigDecimal.valueOf(100.0))
+                .idempotent("test")
+                .pixKeyPayer("payer@pix.com")
+                .pixKeyReceiver("receiver@pix.com")
+                .build();
+
+        when(pixService.sendPix(pixRequestDTO)).thenThrow(new AccountNotFoundException("Account not found"));
+
+        mockMvc.perform(post("/api/pix")
+                        .content(objectMapper.writeValueAsString(pixRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void mustReturnUnprocessableEntity() throws Exception {
+
+        PixRequestDTO pixRequestDTO = PixRequestDTO.builder()
+                .pixValue(BigDecimal.valueOf(100.0))
+                .idempotent("test")
+                .pixKeyPayer("payer@pix.com")
+                .pixKeyReceiver("receiver@pix.com")
+                .build();
+
+        when(pixService.sendPix(pixRequestDTO)).thenThrow(new InsufficientBalanceException("Account not found"));
+
+        mockMvc.perform(post("/api/pix")
+                        .content(objectMapper.writeValueAsString(pixRequestDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
     }
 }
