@@ -55,8 +55,6 @@ public class AccountService {
                         .ownerName(savedAccount.getOwnerName())
                         .build();
 
-        log.info("Account created: ");
-
         return response;
     }
 
